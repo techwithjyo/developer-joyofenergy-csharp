@@ -22,6 +22,7 @@ namespace JOIEnergy.Generator
                     Reading = reading,
                     Time = DateTime.Now.AddSeconds(-i * 10)
                 };
+
                 readings.Add(electricityReading);
             }
             readings.Sort((reading1, reading2) => reading1.Time.CompareTo(reading2.Time));

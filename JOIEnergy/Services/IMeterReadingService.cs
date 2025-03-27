@@ -7,5 +7,7 @@ namespace JOIEnergy.Services
     {
         List<ElectricityReading> GetReadings(string smartMeterId);
         void StoreReadings(string smartMeterId, List<ElectricityReading> electricityReadings);
+        Dictionary<string, List<ElectricityReading>> GetAllReadings();
+        decimal? AverageConsumptionPerDay(string smartMeterId);
     }
 }

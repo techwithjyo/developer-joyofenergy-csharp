@@ -54,7 +54,7 @@ namespace JOIEnergy.Controllers
                 return new ObjectResult(recommendations.Take(limit.Value));
             }
 
-            return new ObjectResult(recommendations);
+            return new ObjectResult(recommendations);  
         }
     }
 }

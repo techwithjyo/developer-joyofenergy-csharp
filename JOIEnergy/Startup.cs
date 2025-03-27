@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using JOIEnergy.Domain;
+﻿using JOIEnergy.Domain;
 using JOIEnergy.Generator;
 using JOIEnergy.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace JOIEnergy
 {
@@ -52,6 +58,7 @@ namespace JOIEnergy
                 }
             };
 
+            services.AddSingleton<TokenService>();
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();
@@ -59,20 +66,64 @@ namespace JOIEnergy
             services.AddSingleton((IServiceProvider arg) => readings);
             services.AddSingleton((IServiceProvider arg) => pricePlans);
             services.AddSingleton((IServiceProvider arg) => SmartMeterToPricePlanAccounts);
+
+            var key = Encoding.ASCII.GetBytes("dasdiabdbadibdbifbiuafuiasnfndusanduasnduasdfuaf");
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = false,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = false
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Startup>>();
+                            logger.LogError("OnAuthenticationFailed: " + context.Exception.Message);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Startup>>();
+                            var token = context.SecurityToken as JwtSecurityToken;
+                            if (token != null)
+                            {
+                                logger.LogInformation("OnTokenValidated: " + token.RawData);
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseMvc();
+            logger.LogInformation("Application started.");
         }
 
-        private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings() {
+        private Dictionary<string, List<ElectricityReading>> GenerateMeterElectricityReadings()
+        {
             var readings = new Dictionary<string, List<ElectricityReading>>();
             var generator = new ElectricityReadingGenerator();
             var smartMeterIds = SmartMeterToPricePlanAccounts.Select(mtpp => mtpp.Key);

@@ -11,15 +11,22 @@ namespace JOIEnergy.Tests
         private static string SMART_METER_ID = "smart-meter-id";
 
         private MeterReadingService meterReadingService;
+        private MeterReadingService meterReadingServiceForDailyAvgConsumption;
 
         public MeterReadingServiceTest()
         {
             meterReadingService = new MeterReadingService(new Dictionary<string, List<ElectricityReading>>());
+            meterReadingServiceForDailyAvgConsumption = new MeterReadingService(new Dictionary<string, List<ElectricityReading>>());
 
             meterReadingService.StoreReadings(SMART_METER_ID, new List<ElectricityReading>() {
                 new ElectricityReading() { Time = DateTime.Now.AddMinutes(-30), Reading = 35m },
                 new ElectricityReading() { Time = DateTime.Now.AddMinutes(-15), Reading = 30m }
             });
+            meterReadingServiceForDailyAvgConsumption.StoreReadings(SMART_METER_ID, new List<ElectricityReading>() {
+            new ElectricityReading() { Time = DateTime.Now.AddDays(-2), Reading = 35m },
+            new ElectricityReading() { Time = DateTime.Now.AddDays(-1), Reading = 30m },
+            new ElectricityReading() { Time = DateTime.Now, Reading = 25m }
+        });
         }
 
         [Fact]
@@ -36,8 +43,18 @@ namespace JOIEnergy.Tests
 
             var electricityReadings = meterReadingService.GetReadings(SMART_METER_ID);
 
-            Assert.Equal(3, electricityReadings.Count);
+            Assert.Equal(3, electricityReadings.Count); 
         }
-
+        [Fact]
+        public void GivenMeterIdThatDoesNotExistShouldReturnZeroAverageConsumption()
+        {
+            Assert.Equal(0, meterReadingServiceForDailyAvgConsumption.AverageConsumptionPerDay("unknown-id"));
+        }
+        [Fact]
+        public void GivenMeterReadingsShouldReturnAverageDailyConsumption()
+        {
+            var averageConsumption = meterReadingServiceForDailyAvgConsumption.AverageConsumptionPerDay(SMART_METER_ID);
+            Assert.Equal(30m, averageConsumption);
+        }
     }
 }

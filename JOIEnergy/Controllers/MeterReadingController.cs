@@ -4,12 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using JOIEnergy.Domain;
 using JOIEnergy.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace JOIEnergy.Controllers
 {
+    [Authorize]
     [Route("readings")]
     public class MeterReadingController : Controller
     {
@@ -41,6 +43,16 @@ namespace JOIEnergy.Controllers
         [HttpGet("read/{smartMeterId}")]
         public ObjectResult GetReading(string smartMeterId) {
             return new OkObjectResult(_meterReadingService.GetReadings(smartMeterId));
+        }
+        [HttpGet("read/all")]
+        public ObjectResult GetAllMeterReading()
+        {
+            return new OkObjectResult(_meterReadingService.GetAllReadings());
+        }
+        [HttpGet("read/average/{smartMeterId}")]
+        public ObjectResult GetAverageReading(string smartMeterId)
+        {
+            return new OkObjectResult(_meterReadingService.AverageConsumptionPerDay(smartMeterId));
         }
     }
 }
