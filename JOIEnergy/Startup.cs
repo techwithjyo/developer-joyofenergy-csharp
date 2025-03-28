@@ -1,5 +1,6 @@
 ﻿using JOIEnergy.Domain;
 using JOIEnergy.Generator;
+using JOIEnergy.RepositoryFolder;
 using JOIEnergy.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -59,6 +60,7 @@ namespace JOIEnergy
             };
 
             services.AddSingleton<TokenService>();
+            services.AddSingleton<IMeterReadingRepository>(new MeterReadingRepository(readings));
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddTransient<IAccountService, AccountService>();
             services.AddTransient<IMeterReadingService, MeterReadingService>();
