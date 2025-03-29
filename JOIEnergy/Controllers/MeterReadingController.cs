@@ -14,10 +14,12 @@ namespace JOIEnergy.Controllers
     public class MeterReadingController : Controller
     {
         private readonly IMeterReadingService _meterReadingService;
+        private readonly IHighUsageService _highUsageService;
 
-        public MeterReadingController(IMeterReadingService meterReadingService)
+        public MeterReadingController(IMeterReadingService meterReadingService, IHighUsageService highUsageService)
         {
             _meterReadingService = meterReadingService;
+            _highUsageService = highUsageService;
         }
         // POST api/values
         [HttpPost ("store")]
@@ -41,6 +43,13 @@ namespace JOIEnergy.Controllers
         [HttpGet("read/{smartMeterId}")]
         public ObjectResult GetReading(string smartMeterId) {
             return new OkObjectResult(_meterReadingService.GetReadings(smartMeterId));
+        }
+
+        [HttpGet("readHighUsage/{smartMeterId}")]
+        public ObjectResult GetHighUsageReading(string smartMeterId)
+        {
+            return new OkObjectResult(_highUsageService.GetHighUsageReading(smartMeterId));
+            
         }
     }
 }
