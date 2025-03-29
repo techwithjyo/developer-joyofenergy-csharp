@@ -8,6 +8,7 @@ namespace JOIEnergy.Controllers
     [Route("average-consumption")]
     public class AverageConsumptionController : Controller
     {
+        [HttpGet]
         public IActionResult Index()
         {
             return View();

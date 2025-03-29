@@ -23,6 +23,7 @@ namespace JOIEnergy.Controllers
 
             return Unauthorized();
         }
+        [HttpGet]
         public IActionResult Index()
         {
             return View();

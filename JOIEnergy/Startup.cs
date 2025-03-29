@@ -108,6 +108,16 @@ namespace JOIEnergy
                         }
                     };
                 });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "JOIEnergy API",
+                    Description = "API Documentaion for JOIEnergy",
+
+                });
+            });
 
         }
 
@@ -117,6 +127,20 @@ namespace JOIEnergy
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            try
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "JOIEnergy API V1");
+                    c.RoutePrefix = string.Empty;
+                });
+            }
+            catch (Exception ex)
+            {
+
+                logger.LogError("An error occurred while setting up Swagger: " + ex.Message);
             }
 
             app.UseAuthentication();
