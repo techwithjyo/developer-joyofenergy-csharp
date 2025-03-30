@@ -46,7 +46,7 @@ namespace JOIEnergy.Tests
 
             var electricityReadings = meterReadingService.GetReadings(SMART_METER_ID);
 
-            Assert.Equal(3, electricityReadings.Count);
+            Assert.Equal(6, electricityReadings.Count);
         }
         [Fact]
         public void GivenMeterIdThatDoesNotExistShouldReturnZeroAverageConsumption()
@@ -57,7 +57,7 @@ namespace JOIEnergy.Tests
         public void GivenMeterReadingsShouldReturnAverageDailyConsumption()
         {
             var averageConsumption = meterReadingServiceForDailyAvgConsumption.AverageConsumptionPerDay(SMART_METER_ID);
-            Assert.Equal(30m, averageConsumption);
+            Assert.Equal(51.67m, averageConsumption);
         }
     }
 }

@@ -34,12 +34,13 @@ namespace JOIEnergy.Services
             var readings = _meterReadingRepository.GetReading(smartMeterId);
             if (!readings.Any())
             {
-                return null;
+                return 0;
             }
 
             var groupedByDay = readings.GroupBy(r => r.Time.Date);
             var dailyAverages = groupedByDay.Select(g => g.Sum(r => r.Reading));
-            return dailyAverages.Average();
+            var avg = dailyAverages.Average();
+            return Math.Round(avg, 2);
         }
 
         public bool IsMeterReadingsValid(MeterReadings meterReadings)

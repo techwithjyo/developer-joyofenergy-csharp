@@ -12,7 +12,7 @@ namespace JOIEnergy.Controllers
             _tokenService = tokenService;
         }
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginModel model)
+        public IActionResult Login([FromBody] LoginModel model)  
         {
             // Validate the user credentials (this is just a simple example)
             if (model.Username == "test" && model.Password == "password")
