@@ -45,6 +45,12 @@ namespace JOIEnergy.Controllers
             return new OkObjectResult(_meterReadingService.GetReadings(smartMeterId));
         }
 
+        [HttpGet("read/LastSevenDays/{smartMeterId}")]
+        public ObjectResult GetReadingLastSevenDays(string smartMeterId)
+        {
+            return new OkObjectResult(_meterReadingService.GetLastSevenDaysReading(smartMeterId));
+        }
+
         [HttpGet("readHighUsage/{smartMeterId}")]
         public ObjectResult GetHighUsageReading(string smartMeterId)
         {
